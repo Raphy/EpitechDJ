@@ -36,7 +36,7 @@ class VideoController extends Controller
         if ($videoYoutubeData["status"] == "fail")
             return new JsonResponse(array(
                 "type" => "alert",
-                "message" => "La vidéo Youtube n'existe pas."
+                "message" => "La vidéo Youtube n'existe pas. Soit parce qu'elle ... n'existe effectivement pas, soit parce que l'exportation n'est pas autorisée par Youtube."
             ), 200);
 
         /**
