@@ -245,6 +245,11 @@
                 loadCurrentVideo();
             }, 2000);
 
+            setInterval(function() {
+                loadCurrentVideoLock = false;
+                loadQueueLock = false;
+            }, 20000);
+
         });
 
     </script>
