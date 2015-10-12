@@ -187,7 +187,11 @@
         {% endif %}
 
         var queue = [];
+        var loadQueueLock = false;
         function loadQueue() {
+            if (loadQueueLock)
+                return;
+            loadQueueLock = true;
             $.get("{{ path("app_player_queue") }}").success(function (data) {
                 queue_items.html("");
                 queue = [];
@@ -195,10 +199,15 @@
                     queue_items.append('<tr><td class="text-center"><img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + data[i].user.login + '.jpg" style="height: 30px" title="' + data[i].user.full_name + ' (' + data[i].user.login + ')"/></td><td>' + data[i].youtube.title + '</td></tr>');
                     queue.push(data[i].youtube.video_id);
                 }
+                loadQueueLock = false;
             });
         }
 
+        var loadCurrentVideoLock = false;
         function loadCurrentVideo() {
+            if (loadCurrentVideoLock)
+                return;
+            loadCurrentVideoLock = true;
             $.get("{{ path("app_player_current") }}").success(function (data) {
                 current_video_title.text(data.youtube.title);
                 current_video_submitter.html('<img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + data.user.login + '.jpg"/><br/><h3>' + data.user.full_name + '</h3>');
@@ -208,6 +217,7 @@
                     queue.shift();
                 }
                 {% endif %}
+                loadCurrentVideoLock = false;
             });
         }
 
