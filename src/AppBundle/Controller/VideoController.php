@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Video;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,6 +37,22 @@ class VideoController extends Controller
             return new JsonResponse(array(
                 "type" => "alert",
                 "message" => "La vidéo Youtube n'existe pas."
+            ), 200);
+
+        /**
+         * @var $videos Video[]
+         * @var $videoRepository EntityRepository
+         */
+
+        $videoRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Video");
+        $videos = $videoRepository->createQueryBuilder("v")
+            ->andWhere("v.user = :user")->setParameter(":user", $this->getUser())
+            ->addOrderBy("v.creationDate", "ASC")
+            ->getQuery()->getResult();
+        if (count($videos) > 0)
+            return new JsonResponse(array(
+                "type" => "alert",
+                "message" => "Vous avez déjà une vidéo en file d'attente. Veuillez attendre sa lecture avant d'en soumettre une autre."
             ), 200);
 
         if ($videoYoutubeData["length_seconds"] > 360) {
