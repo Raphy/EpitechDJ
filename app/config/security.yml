@@ -1,0 +1,47 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+
+    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    providers:
+        epitech:
+            id: raphy_epitech_user.user.provider
+
+    encoders:
+            Raphy\Epitech\UserBundle\Entity\User: plaintext
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        #main:
+         #   anonymous: ~
+            # activate different ways to authenticate
+
+            # http_basic: ~
+            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+
+            # form_login: ~
+            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+
+        main:
+            pattern:                    ^/
+            anonymous:                  true
+            provider:                   epitech
+            switch_user:                true
+            logout:
+                path:                   app_authentication_logout
+                target:                 app_index
+            intranet_login:
+                csrf_provider:          form.csrf_provider
+                login_path:             app_authentication_login
+                check_path:             app_authentication_login_check
+                default_target_path:    app_index
+                username_parameter:     login
+                password_parameter:     password
+                post_only:              true
+            remember_me:
+                key:      "%secret%"
+                lifetime: 604800 # 1 week in seconds
+                path:     /

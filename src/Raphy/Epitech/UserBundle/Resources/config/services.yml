@@ -1,0 +1,7 @@
+services:
+    raphy_epitech_user.user.provider:
+        class:                           Raphy\Epitech\UserBundle\Security\UserProvider
+        arguments:                       [@doctrine.orm.entity_manager]
+    raphy_epitech_user.authentication.provider:
+        class:                          Raphy\Epitech\UserBundle\Security\AuthenticationProvider
+        arguments:                      ["@doctrine.orm.entity_manager", @raphy_epitech_user.user.provider, @security.user_checker, "", @security.encoder_factory, "%security.authentication.hide_user_not_found%", "%super_admin_logins%"]

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>{% block title %}Untitled{% endblock %} - EpitechDJ</title>
+
+    {% stylesheets filter="cssrewrite"
+    'bundles/bmatznerfontawesome/css/font-awesome.min.css'
+    'bundles/bmatznerfoundation/css/foundation.min.css'
+    'bundles/app/css/style.css' %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet"/>
+    {% endstylesheets %}
+
+    {% block stylesheets %}{% endblock %}
+
+    <link href='https://fonts.googleapis.com/css?family=Economica' rel='stylesheet' type='text/css'>
+
+    {% javascripts
+    'bundles/bmatznermodernizr/js/modernizr.min.js' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+</head>
+<body>
+
+{% if app.user %}
+    <div class="sticky">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name">
+                    <h1><a href="{{ path("app_index") }}"><img src="{{ asset("bundles/app/img/edj_logo.png") }}" alt="EpitechDJ" style="height: 25px"/></a></h1>
+                </li>
+                <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+            </ul>
+
+            <section class="top-bar-section">
+                <ul class="right">
+                    {% if is_granted("ROLE_SUPER_ADMIN") %}
+                        <li>
+                            <a>
+                                <span class="fa fa-cog"></span> Administration
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="has-dropdown">
+                        <a>
+                            <img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/commentview/{{ app.user.login }}.jpg" style="height: 25px"/> {{ app.user.login }}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="{{ path("app_authentication_logout") }}">
+                                    <span class="fa fa-sign-out"></span> Déconnexion
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </nav>
+    </div>
+{% endif %}
+
+{% block body %}{% endblock %}
+
+{% javascripts
+'bundles/bmatznerjquery/js/jquery.min.js'
+'bundles/bmatznerfoundation/js/foundation.min.js' %}
+<script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+<script type="text/javascript">
+    $(document).foundation();
+</script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

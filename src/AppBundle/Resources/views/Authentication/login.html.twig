@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="small-12 columns text-center">
+            <img id="login_logo" src="{{ asset("bundles/app/img/edj_logo.png") }}" alt="EpitechDJ"/>
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="row">
+            <div class="small-offset-3 small-6 columns">
+                <div data-alert class="alert-box alert">
+                    {% if error.message == "Bad credentials." %}Votre login et/ou votre mot de passe Unix sont erronés.{% else %}{{ error.message }}{% endif %}
+
+                    <a href="#" class="close">&times;</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row" style="vertical-align: middle">
+        <div class="small-offset-3 small-6 columns">
+            <div class="panel">
+                <form action="{{ path('app_authentication_login_check') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+                    <label for="login"><span class="show-for-medium-up">Votre login</span>
+                        <input type="text" id="login" name="login" placeholder="Votre login" {% if last_username %}value="{{ last_username }}" {% else %}autofocus{% endif %}/>
+                    </label>
+                    <label for="password"><span class="show-for-medium-up">Votre mot de passe Unix</span>
+                        <input type="password" id="password" name="password" placeholder="Votre mot de passe Unix"{% if last_username %} autofocus{% endif %}/>
+                    </label>
+
+                    <div data-alert class="alert-box info text-center">
+                        Votre mot de passe n'est <b>jamais</b> conservé<br/>Le système d'authentification utilise <a href="https://github.com/Raphy/epitech-api" target="_blank">Epitech API <span class="fa fa-external-link"></span></a>
+                    </div>
+                    <p class="text-center"></p>
+
+                    <p class="text-center">
+                        <button type="submit">Connexion</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

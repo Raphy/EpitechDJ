@@ -1,0 +1,42 @@
+app_index:
+    path:     /
+    defaults:
+        _controller: AppBundle:Home:index
+
+# Authentication
+app_authentication_login:
+    path:       /authentication/login
+    defaults:
+        _controller: AppBundle:Authentication:login
+
+app_authentication_login_check:
+    path:       /authentication/login/check
+
+app_authentication_logout:
+    path:       /authentication/logout
+
+# Player
+app_player_current:
+    path:       /player/current
+    defaults:
+        _methods: GET
+        _controller: AppBundle:Player:current
+
+app_player_queue:
+    path:       /player/queue
+    defaults:
+        _methods: GET
+        _controller: AppBundle:Player:queue
+
+app_player_finish:
+    path:       /player/finish
+    defaults:
+        _methods: GET
+        _controller: AppBundle:Player:finish
+
+# Video
+app_video_add:
+    path:       /video/add
+    defaults:
+        _methods: POST
+        _controller: AppBundle:Video:add

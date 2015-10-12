@@ -1,0 +1,58 @@
+body, h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Economica', sans-serif;
+}
+
+body {
+    background-color: #e3e3e3;
+    height: 100%;
+}
+
+button, .button {
+    margin: 0;
+    font-family: 'Economica', sans-serif;
+}
+
+#login_logo {
+    margin: 50px;
+    height: 150px;
+}
+
+.top-bar {
+    margin-bottom: 15px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/*html{*/
+/*height: 100%;*/
+/*}*/
+/*body {*/
+/*min-height: 100%;*/
+/*}*/
+
+/*#right-panel {*/
+/*position: absolute;*/
+/*right: 15px;*/
+/*bottom: 65px;*/
+/*top: 65px;*/
+/*height: 100px;*/
+/*margin: 0;*/
+/*}*/
+
+/*.scrollable-y {*/
+/*overflow-y: scroll;*/
+/*}*/
+
+@media only screen and (min-width: 64.063em) {
+    #queue-container {
+        position: fixed;
+        right: 15px;
+        top: 60px;
+        bottom: 15px;
+        margin: 0;
+        overflow-y: scroll;
+        max-width: 350px;
+    }
+}
