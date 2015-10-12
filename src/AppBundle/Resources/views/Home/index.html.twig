@@ -37,6 +37,7 @@
         <div class="small-12 columns">
             <div id="queue-container" class="panel">
                 <h3 class="text-center">Liste d'attente</h3>
+                <h5 class="text-center" id="queue-duration">Durée: 30h 59m 59s</h5>
                 <button class="full-width" id="add-video-button" disabled="disabled"><span class="fa fa-spinner fa-pulse"></span></button>
                 <table id="queue" class="full-width scrollable-y">
                     <thead>
@@ -138,6 +139,7 @@
         var add_video_url = $("#add-video-url");
         var add_video_submit = $("#add-video-submit");
         var queue_items = $('#queue-items');
+        var queue_duration = $('#queue-duration');
         var add_video_modal = $("#add-video-modal");
         var result_add_video_modal = $("#result-add-video-modal");
         var result_add_video_modal_title = $("#result-add-video-modal-title");
@@ -200,11 +202,19 @@
             loadQueueLock = true;
             $.get("{{ path("app_player_queue") }}").success(function (data) {
                 queue_items.html("");
+                var duration = 0;
                 queue = [];
                 for (i = 0; i < data.length; i++) {
                     queue_items.append('<tr><td class="text-center"><img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + data[i].user.login + '.jpg" style="height: 30px" title="' + data[i].user.full_name + ' (' + data[i].user.login + ')"/></td><td>' + data[i].youtube.title + '</td></tr>');
                     queue.push(data[i].youtube.video_id);
+                    duration += data[i].youtube.length_seconds;
                 }
+                /*
+                 int hours = (int) (time / 3600);
+                 int minutes = ((int) (time / 60)) % 60;
+                 int seconds = time % 60;
+                 */
+                queue_duration.text("Durée: " + Math.round(duration / 3600) + "h " + Math.round((duration / 60) % 60) + "m " + Math.round(duration % 60) + "s");
                 loadQueueLock = false;
             });
         }
