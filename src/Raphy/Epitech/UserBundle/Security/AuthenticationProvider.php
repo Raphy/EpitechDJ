@@ -47,9 +47,9 @@ class AuthenticationProvider extends DaoAuthenticationProvider
         } catch (\Exception $ex) {
             throw new BadCredentialsException("L'intranet ne répond pas.");
         }
-        /*if (!$connector->isSignedIn())
+        if (!$connector->isSignedIn())
             throw new BadCredentialsException();
-        $user->updateFromIntranet($connector->getUser());*/
+        $user->updateFromIntranet($connector->getUser());
         $user->setLastConnectionDate(new \DateTime());
         $roles = $user->getRoles();
         foreach (array_keys($roles, "ROLE_SUPER_ADMIN") as $key)
