@@ -14,7 +14,7 @@
         <div class="row">
             <div class="small-offset-3 small-6 columns">
                 <div data-alert class="alert-box alert">
-                    {% if error.message == "Bad credentials." %}Votre login et/ou votre mot de passe Unix sont erronés.{% else %}{{ error.message }}{% endif %}
+                    {% if error.message == "Bad credentials." %}Vos identifiants Epitech sont erronés.{% else %}{{ error.message }}{% endif %}
 
                     <a href="#" class="close">&times;</a>
                 </div>
@@ -30,8 +30,8 @@
                     <label for="login"><span class="show-for-medium-up">Votre login</span>
                         <input type="text" id="login" name="login" placeholder="Votre login" {% if last_username %}value="{{ last_username }}" {% else %}autofocus{% endif %}/>
                     </label>
-                    <label for="password"><span class="show-for-medium-up">Votre mot de passe Unix</span>
-                        <input type="password" id="password" name="password" placeholder="Votre mot de passe Unix"{% if last_username %} autofocus{% endif %}/>
+                    <label for="password"><span class="show-for-medium-up">Votre mot de passe Unix/Référent</span>
+                        <input type="password" id="password" name="password" placeholder="Votre mot de passe Unix/Référent"{% if last_username %} autofocus{% endif %}/>
                     </label>
 
                     <div data-alert class="alert-box info text-center">

@@ -30,9 +30,18 @@ class PlayerController extends Controller
         $video = $videoRepository->createQueryBuilder("v")
             ->addOrderBy("v.creationDate", "ASC")
             ->setMaxResults(1)
-            ->getQuery()->getSingleResult();
+            ->getQuery()->getOneOrNullResult();
 
         return $video;
+    }
+
+    /**
+     * @Security("has_role('ROLE_SUPER_ADMIN')")
+     * @Template
+     */
+    public function playerAction()
+    {
+        return array();
     }
 
     /**
@@ -72,11 +81,12 @@ class PlayerController extends Controller
 
         $videoRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Video");
         $video = $this->getCurrentVideo();
-        $videos = $videoRepository->createQueryBuilder("v")
+        $videosQueryBuilder = $videoRepository->createQueryBuilder("v")
             ->andWhere("v.creationDate > :from")->setParameter(":from", $from)
-            ->andWhere("v.id != :id")->setParameter(":id", $video->getId())
-            ->addOrderBy("v.creationDate", "ASC")
-            ->getQuery()->getResult();
+            ->addOrderBy("v.creationDate", "ASC");
+        if ($video)
+            $videosQueryBuilder->andWhere("v.id != :id")->setParameter(":id", $video->getId());
+        $videos = $videosQueryBuilder->getQuery()->getResult();
 
         $videosArr = [];
         foreach ($videos as $video) {

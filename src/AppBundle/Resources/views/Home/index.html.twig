@@ -4,41 +4,28 @@
 
 {% block body %}
 
-
     <div class="row">
         <div class="small-12 columns">
-            <div class="panel">
-                <div class="row">
-                    <div class="small-12 columns text-center" id="current-video-submitter">
-                        <span class="fa fa-spinner fa-pulse"></span>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="small-12 columns text-center">
-                        <h1 id="current-video-title"></h1>
-                    </div>
-                </div>
+            <div class="panel text-center" id="current-video">
+                <span class="fa fa-spinner fa-pulse"></span>
             </div>
         </div>
     </div>
-
-    {% if is_granted("ROLE_SUPER_ADMIN") %}
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="panel text-center">
-                    <div id="player"></div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 
     <div class="row">
         <div class="small-12 columns">
             <div id="queue-container" class="panel">
                 <h3 class="text-center">Liste d'attente</h3>
-                <h5 class="text-center" id="queue-duration">Durée: 30h 59m 59s</h5>
-                <button class="full-width" id="add-video-button" disabled="disabled"><span class="fa fa-spinner fa-pulse"></span></button>
+
+                <div class="row">
+                    <div class="small-7 columns">Durée de la file</div>
+                    <div id="queue-total-duration" class="small-5 columns text-right">0s</div>
+                </div>
+                <div class="row">
+                    <div class="small-7 columns">Ma vidéo dans</div>
+                    <div id="queue-my-duration" class="small-5 columns text-right">0s</div>
+                </div>
+                <button class="full-width" id="add-video-button" disabled="disabled" data-reveal-id="add-video-modal"><span class="fa fa-spinner fa-pulse"></span></button>
                 <table id="queue" class="full-width scrollable-y">
                     <thead>
                     <tr>
@@ -57,12 +44,22 @@
                     <h2>Ajouter une vidéo</h2>
 
                     <p class="lead">
-                        <span class="fa fa-warning"></span> La vidéo ne doit pas dépasser 6 min.<br/>
-                        <span class="fa fa-warning"></span> Une seule vidéo par personne dans la file d'attente
+                        <span class="fa fa-fw fa-warning"></span> La vidéo ne doit pas dépasser 6 min.<br/>
+                        <span class="fa fa-fw fa-warning"></span> Une seule vidéo par personne dans la file d'attente<br/>
+                        <span class="fa fa-fw fa-warning"></span> La même vidéo ne peut être qu'une fois dans la file d'attente
                     </p>
 
-                    <label>Adresse de la vidéo Youtube<input type="url" id="add-video-url" placeholder="Exemple: https://www.youtube.com/watch?v=dQw4w9WgXcQ"/></label>
-                    <button id="add-video-submit">Envoyer</button>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <label>
+                                Adresse de la vidéo Youtube
+                                <input id="add-video-form-url" class="full-width" type="url" placeholder="Exemple: https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
+                            </label>
+                        </div>
+                        <div class="small-12 columns">
+                            <button id="add-video-form-submit" class="full-width" type="submit">Envoyer</button>
+                        </div>
+                    </div>
 
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
@@ -132,140 +129,79 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="http://www.youtube.com/player_api"></script>
+    <script src="{{ asset("bundles/app/js/EpitechDJ.js") }}"></script>
     <script>
+        var EpitechDJ;
 
-        var add_video_button = $("#add-video-button");
-        var add_video_url = $("#add-video-url");
-        var add_video_submit = $("#add-video-submit");
-        var queue_items = $('#queue-items');
-        var queue_duration = $('#queue-duration');
-        var add_video_modal = $("#add-video-modal");
-        var result_add_video_modal = $("#result-add-video-modal");
-        var result_add_video_modal_title = $("#result-add-video-modal-title");
-        var result_add_video_modal_message = $("#result-add-video-modal-message");
-        var current_video_submitter = $("#current-video-submitter");
-        var current_video_title = $("#current-video-title");
+        function updateCurrentVideo(user, title) {
+            $("#current-video").html(
+                    '<img alt="Photo" title="' + user.login + '" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + user.login + '.jpg"/><br/><h3>' + user.full_name + '</h3><br/>' +
+                    '<h1>' + title + '</h1>'
+            );
+        }
+
+        function appendVideoInQueue(user, title) {
+            $("#queue-items").append(
+                    '<tr>' +
+                    '<td class="text-center">' +
+                    '<img alt="Photo" title="' + user.full_name + ' (' + user.login + ')" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + user.login + '.jpg" style="height: 30px" />' +
+                    '</td>' +
+                    '<td>' + title + '</td>' +
+                    '</tr>');
+
+        }
 
         function setLoadingAddVideoButton() {
-            add_video_button.html('<span class="fa fa-spinner fa-pulse"></span> En cours...');
-            add_video_button.attr("disabled", "disabled");
+            var addVideoButton = $("#add-video-button");
+            addVideoButton.html('<span class="fa fa-spinner fa-pulse"></span> En cours...');
+            addVideoButton.attr("disabled", "disabled");
         }
         function setReadyAddVideoButton() {
-            add_video_button.html('<span class="fa fa-plus"></span> Ajouter une vidéo');
-            add_video_button.removeAttr("disabled");
-        }
-
-        function addVideo(url) {
-            $.post("{{ path("app_video_add") }}", {url: url}).success(function (data) {
-                console.log(data);
-                setReadyAddVideoButton();
-                result_add_video_modal_message.attr("class", "");
-                result_add_video_modal_message.addClass("alert-box");
-                result_add_video_modal_message.addClass(data.type);
-                result_add_video_modal_message.text(data.message);
-                result_add_video_modal.foundation("reveal", "open");
-            });
-        }
-
-        {% if is_granted("ROLE_SUPER_ADMIN") %}
-        var player;
-        function onYouTubePlayerAPIReady() {
-            player = new YT.Player('player', {
-                events: {
-                    onReady: onPlayerReady,
-                    onStateChange: onPlayerStateChange
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            event.target.setVolume(0);
-            event.target.setPlaybackQuality("hd720");
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.ENDED) {
-                $.get("{{ path("app_player_finish") }}").success(function (data) {
-                    player.loadVideoById(queue[0]);
-                    queue.shift();
-                });
-            }
-        }
-        {% endif %}
-
-        var queue = [];
-        var loadQueueLock = false;
-        function loadQueue() {
-            if (loadQueueLock)
-                return;
-            loadQueueLock = true;
-            $.get("{{ path("app_player_queue") }}").success(function (data) {
-                queue_items.html("");
-                var duration = 0;
-                queue = [];
-                for (i = 0; i < data.length; i++) {
-                    queue_items.append('<tr><td class="text-center"><img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + data[i].user.login + '.jpg" style="height: 30px" title="' + data[i].user.full_name + ' (' + data[i].user.login + ')"/></td><td>' + data[i].youtube.title + '</td></tr>');
-                    queue.push(data[i].youtube.video_id);
-                    duration += data[i].youtube.length_seconds;
-                }
-                /*
-                 int hours = (int) (time / 3600);
-                 int minutes = ((int) (time / 60)) % 60;
-                 int seconds = time % 60;
-                 */
-                queue_duration.text("Durée: " + Math.round(duration / 3600) + "h " + Math.round((duration / 60) % 60) + "m " + Math.round(duration % 60) + "s");
-                loadQueueLock = false;
-            });
-        }
-
-        var loadCurrentVideoLock = false;
-        function loadCurrentVideo() {
-            if (loadCurrentVideoLock)
-                return;
-            loadCurrentVideoLock = true;
-            $.get("{{ path("app_player_current") }}").success(function (data) {
-                current_video_title.text(data.youtube.title);
-                current_video_submitter.html('<img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/trombiview/' + data.user.login + '.jpg"/><br/><h3>' + data.user.full_name + '</h3>');
-                {% if is_granted("ROLE_SUPER_ADMIN") %}
-                if (player.getPlayerState() == YT.PlayerState.CUED || player.getPlayerState() == YT.PlayerState.ENDED) {
-                    player.loadVideoById(data.youtube.video_id);
-                    queue.shift();
-                }
-                {% endif %}
-                loadCurrentVideoLock = false;
-            });
+            var addVideoButton = $("#add-video-button");
+            $("#add-video-form-url").val('');
+            addVideoButton.html('<span class="fa fa-plus"></span> Ajouter une vidéo');
+            addVideoButton.removeAttr("disabled");
         }
 
         $(document).ready(function () {
-
+            EpitechDJ = new EpitechDJ({
+                loadCurrentVideoUri: "{{ path("app_player_current") }}",
+                loadQueueUri: "{{ path("app_player_queue") }}",
+                addVideoUri: "{{ path("app_video_add") }}",
+                currentVideoLoaded: function (video) {
+                    updateCurrentVideo(video.user, video.youtube.title);
+                },
+                queueLoaded: function (videos, haveToRedraw) {
+                    var queueItems = $("#queue-items");
+                    if (haveToRedraw)
+                        queueItems.html('');
+                    for (i = 0; i < videos.length; i++) {
+                        appendVideoInQueue(videos[i].user, videos[i].youtube.title);
+                    }
+                    var duration = EpitechDJ.getQueueDuration();
+                    $("#queue-total-duration").text(Math.trunc(duration / 3600) + "h " + Math.trunc((duration / 60) % 60) + "m " + Math.trunc(duration % 60) + "s");
+                    duration = EpitechDJ.getQueueDuration("{{ app.user.login }}");
+                    $("#queue-my-duration").text(Math.trunc(duration / 3600) + "h " + Math.trunc((duration / 60) % 60) + "m " + Math.trunc(duration % 60) + "s");
+                },
+                videoAdded: function (type, message) {
+                    var result_add_video_modal = $("#result-add-video-modal");
+                    var result_add_video_modal_message = $("#result-add-video-modal-message");
+                    result_add_video_modal_message.attr("class", "");
+                    result_add_video_modal_message.addClass("alert-box");
+                    result_add_video_modal_message.addClass(type);
+                    result_add_video_modal_message.text(message);
+                    result_add_video_modal.foundation("reveal", "open");
+                    setReadyAddVideoButton();
+                }
+            });
+            EpitechDJ.sync();
             setReadyAddVideoButton();
-
-            add_video_submit.click(function () {
-                var url = add_video_url.val();
-                add_video_url.val("");
-                addVideo(url);
+            $("#add-video-form-submit").click(function () {
+                $("#add-video-modal").foundation("reveal", "close");
+                var addVideoFormUrl = $("#add-video-form-url");
                 setLoadingAddVideoButton();
-                add_video_modal.foundation("reveal", "close");
+                EpitechDJ.addVideo(addVideoFormUrl.val());
             });
-
-            add_video_button.click(function () {
-                add_video_modal.foundation("reveal", "open");
-            });
-
-            setInterval(function () {
-                loadQueue(0);
-            }, 1000);
-
-            setInterval(function () {
-                loadCurrentVideo();
-            }, 2000);
-
-            setInterval(function() {
-                loadCurrentVideoLock = false;
-                loadQueueLock = false;
-            }, 20000);
-
         });
 
     </script>

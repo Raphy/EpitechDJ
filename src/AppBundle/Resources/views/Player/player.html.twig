@@ -1,0 +1,72 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Lecteur{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="panel text-center">
+                <div id="player"><span class="fa fa-spin fa-pulse"></span></div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="http://www.youtube.com/player_api"></script>
+    <script src="{{ asset("bundles/app/js/EpitechDJ.js") }}"></script>
+    <script>
+
+        var youtubePlayer;
+        var EpitechDJ;
+
+        function onYouTubePlayerAPIReady() {
+            youtubePlayer = new YT.Player('player', {
+                events: {
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady() {
+            youtubePlayer.setVolume(100);
+            youtubePlayer.setPlaybackQuality("hd720");
+            loadVideo(EpitechDJ.getCurrentVideo());
+        }
+
+        function onPlayerStateChange() {
+            var state = youtubePlayer.getPlayerState();
+            if (state == 0) {
+                $.post("{{ path("app_player_finish") }}");
+                if (EpitechDJ.getQueue().length > 0) {
+                    loadVideo(EpitechDJ.getQueue()[0]);
+                }
+            }
+        }
+
+        function loadVideo(video) {
+            if (typeof youtubePlayer != "undefined" && typeof video != "undefined") {
+                var state = youtubePlayer.getPlayerState();
+                if (state == 0 || state == 5)
+                    youtubePlayer.loadVideoById(video.youtube.video_id);
+            }
+        }
+
+        $(document).ready(function () {
+            EpitechDJ = new EpitechDJ({
+                loadCurrentVideoUri: "{{ path("app_player_current") }}",
+                loadQueueUri: "{{ path("app_player_queue") }}",
+                currentVideoLoaded: function (video) {
+                    loadVideo(video);
+                },
+                queueLoaded: function (videos, haveToRedraw) {
+                }
+            });
+            EpitechDJ.sync();
+        });
+
+    </script>
+{% endblock %}

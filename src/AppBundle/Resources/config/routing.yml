@@ -16,6 +16,12 @@ app_authentication_logout:
     path:       /authentication/logout
 
 # Player
+app_player_player:
+    path:       /player/player
+    defaults:
+        _methods: GET
+        _controller: AppBundle:Player:player
+
 app_player_current:
     path:       /player/current
     defaults:
@@ -31,7 +37,7 @@ app_player_queue:
 app_player_finish:
     path:       /player/finish
     defaults:
-        _methods: GET
+        _methods: POST
         _controller: AppBundle:Player:finish
 
 # Video

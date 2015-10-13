@@ -40,11 +40,16 @@ class AuthenticationProvider extends DaoAuthenticationProvider
 
     public function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
     {
+
         $connector = new \EpitechAPI\Connector();
-        $connector->authenticate(\EpitechAPI\Connector::SIGN_IN_METHOD_CREDENTIALS, $user->getUsername(), $token->getCredentials());
-        if (!$connector->isSignedIn())
+        try {
+            $connector->authenticate(\EpitechAPI\Connector::SIGN_IN_METHOD_CREDENTIALS, $user->getUsername(), $token->getCredentials());
+        } catch (\Exception $ex) {
+            throw new BadCredentialsException("L'intranet ne répond pas.");
+        }
+        /*if (!$connector->isSignedIn())
             throw new BadCredentialsException();
-        $user->updateFromIntranet($connector->getUser());
+        $user->updateFromIntranet($connector->getUser());*/
         $user->setLastConnectionDate(new \DateTime());
         $roles = $user->getRoles();
         foreach (array_keys($roles, "ROLE_SUPER_ADMIN") as $key)

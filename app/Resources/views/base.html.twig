@@ -36,6 +36,11 @@
                 <ul class="right">
                     {% if is_granted("ROLE_SUPER_ADMIN") %}
                         <li>
+                            <a href="{{ path("app_player_player") }}">
+                                <span class="fa fa-play"></span> Lecteur
+                            </a>
+                        </li>
+                        <li>
                             <a>
                                 <span class="fa fa-cog"></span> Administration
                             </a>
@@ -43,7 +48,7 @@
                     {% endif %}
                     <li class="has-dropdown">
                         <a>
-                            <img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/commentview/{{ app.user.login }}.jpg" style="height: 25px"/> {{ app.user.login }}
+                            <img alt="Avatar" src="https://cdn.local.epitech.eu/userprofil/commentview/{{ app.user.login }}.jpg" style="height: 25px"/> {{ app.user.fullName }}
                         </a>
                         <ul class="dropdown">
                             <li>

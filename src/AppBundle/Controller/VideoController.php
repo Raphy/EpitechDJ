@@ -39,36 +39,39 @@ class VideoController extends Controller
                 "message" => "La vidéo Youtube n'existe pas. Soit parce qu'elle ... n'existe effectivement pas, soit parce que l'exportation n'est pas autorisée par Youtube."
             ), 200);
 
-        if ($videoYoutubeData["length_seconds"] > 360) {
-            return new JsonResponse(array(
-                "type" => "alert",
-                "message" => "La vidéo Youtube dépasse les 6 min"
-            ), 200);
-        }
 
-        /**
-         * @var $videos Video[]
-         * @var $videoRepository EntityRepository
-         */
-
-        $videoRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Video");
-        $videos = $videoRepository->createQueryBuilder("v")
-            ->andWhere("v.user = :user")->setParameter(":user", $this->getUser())
-            ->addOrderBy("v.creationDate", "ASC")
-            ->getQuery()->getResult();
-        if (count($videos) > 0)
-            return new JsonResponse(array(
-                "type" => "alert",
-                "message" => "Vous avez déjà une vidéo en file d'attente. Veuillez attendre sa lecture avant d'en soumettre une autre."
-            ), 200);
-
-        foreach ($videos as $video) {
-            $youtube = $video->getYoutube();
-            if ($youtube["video_id"] == $matches[1])
+        if (!$this->get('security.context')->isGranted("ROLE_SUPER_ADMIN")) {
+            if ($videoYoutubeData["length_seconds"] > 360) {
                 return new JsonResponse(array(
                     "type" => "alert",
-                    "message" => "Cette vidéo est déjà présente dans la liste d'attente. Veuillez attendre sa lecture avant de la soumettre à nouveau."
+                    "message" => "La vidéo Youtube dépasse les 6 min"
                 ), 200);
+            }
+
+            /**
+             * @var $videos Video[]
+             * @var $videoRepository EntityRepository
+             */
+
+            $videoRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Video");
+            $videos = $videoRepository->createQueryBuilder("v")
+                ->andWhere("v.user = :user")->setParameter(":user", $this->getUser())
+                ->addOrderBy("v.creationDate", "ASC")
+                ->getQuery()->getResult();
+            if (count($videos) > 0)
+                return new JsonResponse(array(
+                    "type" => "alert",
+                    "message" => "Vous avez déjà une vidéo en file d'attente. Veuillez attendre sa lecture avant d'en soumettre une autre."
+                ), 200);
+
+            foreach ($videos as $video) {
+                $youtube = $video->getYoutube();
+                if ($youtube["video_id"] == $matches[1])
+                    return new JsonResponse(array(
+                        "type" => "alert",
+                        "message" => "Cette vidéo est déjà présente dans la liste d'attente. Veuillez attendre sa lecture avant de la soumettre à nouveau."
+                    ), 200);
+            }
         }
 
         $video = new Video();

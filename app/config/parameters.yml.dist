@@ -20,3 +20,5 @@ parameters:
 
     super_admin_logins:
         - defrei_r
+        - baron_l
+        - campio_j
