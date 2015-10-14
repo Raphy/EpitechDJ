@@ -42,6 +42,7 @@ security:
                 password_parameter:     password
                 post_only:              true
             remember_me:
-                key:      "%secret%"
-                lifetime: 604800 # 1 week in seconds
-                path:     /
+                key:                    "%secret%"
+                lifetime:               604800
+                path:                   app_index
+                always_remember_me:     true

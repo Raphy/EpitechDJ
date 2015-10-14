@@ -19,7 +19,7 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
 
-        "raphy/epitech-api": "~2.0",
+
         "bmatzner/foundation-bundle": "~5.0",
         "bmatzner/fontawesome-bundle": "~4.0",
         "bmatzner/modernizr-bundle": "~2.0",
