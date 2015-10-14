@@ -40,10 +40,10 @@
                     </tbody>
                 </table>
 
-                <div id="add-video-modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                <div id="add-video-modal" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
                     <h2>Ajouter une vidéo</h2>
 
-                    <p class="lead">
+                    <p>
                         <span class="fa fa-fw fa-warning"></span> La vidéo ne doit pas dépasser 6 min.<br/>
                         <span class="fa fa-fw fa-warning"></span> Une seule vidéo par personne dans la file d'attente<br/>
                         <span class="fa fa-fw fa-warning"></span> La même vidéo ne peut être qu'une fois dans la file d'attente
@@ -63,7 +63,7 @@
 
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
-                <div id="result-add-video-modal" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                <div id="result-add-video-modal" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
                     <h2 id="result-add-video-modal-title">Ajouter une vidéo</h2>
 
                     <div class="alert-box text-center" id="result-add-video-modal-message"></div>
@@ -76,6 +76,8 @@
     <div class="row">
         <div class="small-12 columns">
             <div class="panel">
+                <button class="right" data-reveal-id="vote-help-modal"><span class="fa fa-info"></span></button>
+
                 <h3>Votes (<span id="vote-count">0</span>)</h3>
 
                 <p class="lead">Vous pouvez effectuer 1 seul vote par vidéo</p>
@@ -124,6 +126,50 @@
                         </button>
                     </div>
                 </div>
+
+                <div id="vote-help-modal" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
+                    <h2>Fonctionnement des votes</h2>
+
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h4>Le son</h4>
+                            <strong>« Fait péter le son »</strong> permet de voter pour augmenter le son<br/>
+                            <strong>« C'est trop fort ! »</strong> permet de voter pour baisser le son<br/>
+
+                            <br/>
+
+                            Pour calculer le volume du son (en %), la formule suivante est utilisée:<br/>
+                            <em>pourcentage_son = 50 + ((votes_augmenter_le_son - votes_baisser_le_son) / nombre_de_votes) * 50</em><br/>
+
+                            <br/>
+
+                            <h4>J'aime / J'aime pas</h4>
+                            <strong>« Remet moi ça ! »</strong> permet de voter pour remettre la vidéo en file d'attente.<br/>
+                            <strong>« It's bulls**t ! »</strong> permet de voter pour passer la vidéo en cours.<br/><br/>
+                            Pour savoir si une vidéo doit être remise en file d'attente, lorsque celle-ci est finie, on vérifie par la formule suivante :<br/>
+                            <em>doit_remettre_en_file = (votes_like - votes_dislike) / nombre_de_votes > 0.5 ? TRUE : FALSE</em><br/>
+
+                            <br/>
+
+                            Pour savoir si une vidéo doit être passée, on vérifie par la formule suivante :<br/>
+                            <em>doit_passer = (votes_like - votes_dislike) <= -10 && -(votes_like - votes_dislike) / nombre_de_votes > 0.5 ? TRUE : FALSE</em><br/>
+
+                            <br/>
+
+                            <h4>Repéter</h4>
+                            <strong>« Encore et encore !»</strong> permet de voter pour répéter la vidéo lorsque celle-ci est finie.<br/>
+
+                            <br/>
+
+                            Pour savoir si une vidéo doit être répetée, on vérifie par la formule suivante :<br/>
+                            <em>doit_repeter = votes_repeter / nombre_de_votes > 0.5 ? TRUE : FALSE</em><br/>
+
+                        </div>
+                    </div>
+
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+
             </div>
         </div>
     </div>
