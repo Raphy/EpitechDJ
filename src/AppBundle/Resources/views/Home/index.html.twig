@@ -222,10 +222,6 @@
                     vote_repeat.text(Math.trunc(repeat));
                     if (count > 0 && repeat / count > 0.5)
                         vote_repeat.parent().css("color", "darkgreen");
-
-                    console.log("Volume: " + Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
-                    console.log("Like: " + (heart / count > 0.5));
-                    console.log("Repeat: " + (repeat / count > 0.5));
                 }
             });
             var vote = null;
