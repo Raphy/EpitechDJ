@@ -46,9 +46,8 @@
                     repeated = true;
                 } else {
                     $.post("{{ path("app_player_finish") }}");
-                    if (EpitechDJ.getQueue().length > 0) {
-                        loadVideo(EpitechDJ.getQueue()[0], true);
-                    }
+                    if (EpitechDJ.getQueue().length > 0)
+                        loadVideo(EpitechDJ.getQueue()[0]);
                 }
             }
         }
@@ -74,11 +73,10 @@
                 },
                 votesLoaded: function (count, volume, heart, repeat) {
                     youtubePlayer.setVolume(50 + (volume / count) * 50);
-                    if (heart <= -10) {
+                    if (heart <= -5 && count > 0 && -heart / count > 0.5) {
                         $.post("{{ path("app_player_finish") }}");
-                        if (EpitechDJ.getQueue().length > 0) {
-                            loadVideo(EpitechDJ.getQueue()[0]);
-                        }
+                        if (EpitechDJ.getQueue().length > 0)
+                            loadVideo(EpitechDJ.getQueue()[0], true);
                     }
                 }
             });
