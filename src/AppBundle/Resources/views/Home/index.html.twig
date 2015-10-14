@@ -210,10 +210,19 @@
                     setReadyAddVideoButton();
                 },
                 votesLoaded: function (count, volume, heart, repeat) {
-                    $("#vote-count").text(count);
-                    $("#vote-volume").text(Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
-                    $("#vote-heart").text(Math.trunc(heart));
-                    $("#vote-repeat").text(Math.trunc(repeat));
+                    var vote_count = $("#vote-count");
+                    var vote_volume = $("#vote-volume");
+                    var vote_heart = $("#vote-heart");
+                    var vote_repeat = $("#vote-repeat");
+                    vote_count.text(count);
+                    vote_volume.text(Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
+                    vote_heart.text(Math.trunc(heart));
+                    if (count > 0 && heart / count > 0.5)
+                        vote_heart.parent().css("color", "darkgreen");
+                    vote_repeat.text(Math.trunc(repeat));
+                    if (count > 0 && repeat / count > 0.5)
+                        vote_repeat.parent().css("color", "darkgreen");
+
                     console.log("Volume: " + Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
                     console.log("Like: " + (heart / count > 0.5));
                     console.log("Repeat: " + (repeat / count > 0.5));
