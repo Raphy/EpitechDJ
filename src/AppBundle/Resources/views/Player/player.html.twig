@@ -21,6 +21,7 @@
 
         var youtubePlayer;
         var EpitechDJ;
+        var repeated = false;
 
         function onYouTubePlayerAPIReady() {
             youtubePlayer = new YT.Player('player', {
@@ -32,7 +33,7 @@
         }
 
         function onPlayerReady() {
-            youtubePlayer.setVolume(100);
+            youtubePlayer.setVolume(50);
             youtubePlayer.setPlaybackQuality("hd720");
             loadVideo(EpitechDJ.getCurrentVideo());
         }
@@ -40,9 +41,14 @@
         function onPlayerStateChange() {
             var state = youtubePlayer.getPlayerState();
             if (state == 0) {
-                $.post("{{ path("app_player_finish") }}");
-                if (EpitechDJ.getQueue().length > 0) {
-                    loadVideo(EpitechDJ.getQueue()[0]);
+                if (!repeated && EpitechDJ.getVotes().repeat / EpitechDJ.getVotes().count > 0.5) {
+                    loadVideo(EpitechDJ.getCurrentVideo());
+                    repeated = true;
+                } else {
+                    $.post("{{ path("app_player_finish") }}");
+                    if (EpitechDJ.getQueue().length > 0) {
+                        loadVideo(EpitechDJ.getQueue()[0]);
+                    }
                 }
             }
         }
@@ -60,11 +66,12 @@
                 loadCurrentVideoUri: "{{ path("app_player_current") }}",
                 loadQueueUri: "{{ path("app_player_queue") }}",
                 votesUri: "{{ path("app_player_votes") }}",
+                addVideoUri: "{{ path("app_video_add") }}",
                 currentVideoLoaded: function (video) {
                     loadVideo(video);
                 },
                 votesLoaded: function (count, volume, heart, repeat) {
-                    youtubePlayer.setVolume(50 + volume);
+                    youtubePlayer.setVolume(50 + (volume / count) * 50);
                 }
             });
             EpitechDJ.sync();

@@ -53,6 +53,10 @@ EpitechDJ.prototype.getQueueDuration = function (login) {
     return seconds;
 };
 
+EpitechDJ.prototype.getVotes = function () {
+    return this.votes;
+}
+
 EpitechDJ.prototype.addVideo = function (url) {
     if (this.addVideoUri != null) {
         // Requesting

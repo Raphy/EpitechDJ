@@ -37,6 +37,52 @@ class PlayerController extends Controller
     }
 
     /**
+     * Get the votes
+     *
+     * @return array
+     */
+    private function getVotes()
+    {
+        /**
+         * @var $votes Vote[]
+         * @var $vote Vote
+         * @var $voteRepository EntityRepository
+         */
+
+        $voteRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Vote");
+        $votes = $voteRepository->findAll();
+
+        $votesArr = array(
+            "count" => count($votes),
+            "volume" => 0,
+            "heart" => 0,
+            "repeat" => 0
+        );
+
+        foreach ($votes as $vote) {
+            switch ($vote->getType()) {
+                case Vote::VOTE_TYPE_DISLIKE:
+                    $votesArr["heart"]--;
+                    break;
+                case Vote::VOTE_TYPE_LIKE:
+                    $votesArr["heart"]++;
+                    break;
+                case Vote::VOTE_TYPE_REPEAT:
+                    $votesArr["repeat"]++;
+                    break;
+                case Vote::VOTE_TYPE_VOLUME_DOWN:
+                    $votesArr["volume"]--;
+                    break;
+                case Vote::VOTE_TYPE_VOLUME_UP:
+                    $votesArr["volume"]++;
+                    break;
+            }
+        }
+
+        return $votesArr;
+    }
+
+    /**
      * @Security("has_role('ROLE_SUPER_ADMIN')")
      * @Template
      */
@@ -55,7 +101,7 @@ class PlayerController extends Controller
         if ($video === null)
             throw new NotFoundHttpException();
 
-        $videoJson = array(
+        $videoArr = array(
             "id" => $video->getId(),
             "timestamp" => $video->getCreationDate()->getTimestamp(),
             "youtube" => $video->getYoutube(),
@@ -64,7 +110,7 @@ class PlayerController extends Controller
                 "full_name" => $video->getUser()->getFullName()
             )
         );
-        return new JsonResponse($videoJson);
+        return new JsonResponse($videoArr);
     }
 
     /**
@@ -117,7 +163,13 @@ class PlayerController extends Controller
 
         $video = $video = $this->getCurrentVideo();
         if ($video) {
-            $this->getDoctrine()->getManager()->remove($video);
+            $votesArr = $this->getVotes();
+            if ($votesArr["count"] > 0 && $votesArr["heart"] / $votesArr["count"] > 0.5) {
+                $video->setCreationDate(new \DateTime());
+                $this->getDoctrine()->getManager()->persist($video);
+            } else {
+                $this->getDoctrine()->getManager()->remove($video);
+            }
             $voteRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Vote");
             $votes = $voteRepository->findAll();
             foreach ($votes as $vote)
@@ -130,44 +182,9 @@ class PlayerController extends Controller
     /**
      * @Security("has_role('ROLE_USER')")
      */
-    public function votesAction(Request $request)
+    public function votesAction()
     {
-        /**
-         * @var $votes Vote[]
-         * @var $vote Vote
-         * @var $voteRepository EntityRepository
-         */
-
-        $voteRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Vote");
-        $votes = $voteRepository->findAll();
-
-        $votesArr = array(
-            "count" => count($votes),
-            "volume" => 0,
-            "heart" => 0,
-            "repeat" => 0
-        );
-
-        foreach ($votes as $vote) {
-            switch ($vote->getType()) {
-                case Vote::VOTE_TYPE_DISLIKE:
-                    $votesArr["heart"]--;
-                    break;
-                case Vote::VOTE_TYPE_LIKE:
-                    $votesArr["heart"]++;
-                    break;
-                case Vote::VOTE_TYPE_REPEAT:
-                    $votesArr["repeat"]++;
-                    break;
-                case Vote::VOTE_TYPE_VOLUME_DOWN:
-                    $votesArr["volume"]--;
-                    break;
-                case Vote::VOTE_TYPE_VOLUME_UP:
-                    $votesArr["volume"]++;
-                    break;
-            }
-        }
-
+        $votesArr = $this->getVotes();
         return new JsonResponse($votesArr);
     }
 }

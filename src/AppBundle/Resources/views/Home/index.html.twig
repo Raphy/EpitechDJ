@@ -76,7 +76,7 @@
     <div class="row">
         <div class="small-12 columns">
             <div class="panel">
-                <h3>Vote</h3>
+                <h3>Votes (<span id="vote-count">0</span>)</h3>
 
                 <p class="lead">Vous pouvez effectuer 1 seul vote par vidéo</p>
                 <hr/>
@@ -105,24 +105,25 @@
                     </div>
                 </div>
 
+                <br/>
 
-                {#<br/><div class="row">#}
-                    {#<div class="small-4 columns">#}
-                        {#<button id="vote-add-like" class="full-width">#}
-                            {#<span class="fa fa-fw fa-thumbs-up"></span> Remet moi ça !#}
-                        {#</button>#}
-                    {#</div>#}
-                    {#<div class="small-4 columns">#}
-                        {#<button id="vote-add-repeat" class="full-width">#}
-                            {#<span class="fa fa-fw fa-refresh"></span> Encore et encore !#}
-                        {#</button>#}
-                    {#</div>#}
-                    {#<div class="small-4 columns">#}
-                        {#<button id="vote-add-dislike" class="full-width">#}
-                            {#<span class="fa fa-fw fa-thumbs-down"></span> It's bulls**t !#}
-                        {#</button>#}
-                    {#</div>#}
-                {#</div>#}
+                <div class="row">
+                    <div class="small-4 columns">
+                        <button id="vote-add-like" class="full-width">
+                            <span class="fa fa-fw fa-thumbs-up"></span> Remet moi ça !
+                        </button>
+                    </div>
+                    <div class="small-4 columns">
+                        <button id="vote-add-repeat" class="full-width">
+                            <span class="fa fa-fw fa-refresh"></span> Encore et encore !
+                        </button>
+                    </div>
+                    <div class="small-4 columns">
+                        <button id="vote-add-dislike" class="full-width">
+                            <span class="fa fa-fw fa-thumbs-down"></span> It's bulls**t !
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -209,9 +210,13 @@
                     setReadyAddVideoButton();
                 },
                 votesLoaded: function (count, volume, heart, repeat) {
-                    $("#vote-volume").text((50 + volume) + "%");
-                    $("#vote-heart").text(heart);
-                    $("#vote-repeat").text(repeat);
+                    $("#vote-count").text(count);
+                    $("#vote-volume").text(Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
+                    $("#vote-heart").text(Math.trunc(heart));
+                    $("#vote-repeat").text(Math.trunc(repeat));
+                    console.log("Volume: " + Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)) + "%");
+                    console.log("Like: " + (heart / count > 0.5));
+                    console.log("Repeat: " + (repeat / count > 0.5));
                 }
             });
             var vote = null;
