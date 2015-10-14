@@ -181,8 +181,10 @@
                 votesUri: "{{ path("app_player_votes") }}",
                 currentVideoLoaded: function (video) {
                     updateCurrentVideo(video.user, video.youtube.title);
-                    if (typeof vote != "undefined" && vote != null)
+                    if (typeof vote != "undefined" && vote != null) {
                         vote.removeClass("success");
+                        vote = null;
+                    }
                 },
                 queueLoaded: function (videos, haveToRedraw) {
                     var queueItems = $("#queue-items");
