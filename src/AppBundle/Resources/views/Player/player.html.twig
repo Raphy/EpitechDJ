@@ -73,7 +73,7 @@
                 },
                 votesLoaded: function (count, volume, heart, repeat) {
                     youtubePlayer.setVolume(Math.trunc(50 + (count > 0 ? (volume / count) * 50 : 0)));
-                    if (heart <= -10 && count > 0 && -heart / count > 0.5) {
+                    if (heart <= -5 && count > 0 && -heart / count > 0.5) {
                         $.post("{{ path("app_player_finish") }}");
                         if (EpitechDJ.getQueue().length > 0)
                             loadVideo(EpitechDJ.getQueue()[0], true);
