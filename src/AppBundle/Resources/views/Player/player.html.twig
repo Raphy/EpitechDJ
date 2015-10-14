@@ -46,18 +46,17 @@
                     repeated = true;
                 } else {
                     $.post("{{ path("app_player_finish") }}");
-                    youtubePlayer.stopVideo();
                     if (EpitechDJ.getQueue().length > 0) {
-                        loadVideo(EpitechDJ.getQueue()[0]);
+                        loadVideo(EpitechDJ.getQueue()[0], true);
                     }
                 }
             }
         }
 
-        function loadVideo(video) {
+        function loadVideo(video, force) {
             if (typeof youtubePlayer != "undefined" && typeof video != "undefined") {
                 var state = youtubePlayer.getPlayerState();
-                if (state == 0 || state == 5) {
+                if ((typeof force != "undefined" && force) || state == 0 || state == 5) {
                     youtubePlayer.setVolume(50 + (EpitechDJ.getVotes().count > 0 ? EpitechDJ.getVotes().volume / EpitechDJ.getVotes().count * 50 : 0));
                     youtubePlayer.loadVideoById(video.youtube.video_id);
                 }
