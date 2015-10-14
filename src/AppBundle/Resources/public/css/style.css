@@ -35,5 +35,6 @@ button, .button {
         overflow-y: scroll;
         max-width: 300px;
         min-width: 300px;
+        padding-right: 5px;
     }
 }
