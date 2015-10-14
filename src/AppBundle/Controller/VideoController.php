@@ -38,10 +38,10 @@ class VideoController extends Controller
 
 
         if (!$this->get('security.context')->isGranted("ROLE_SUPER_ADMIN")) {
-            if ($videoYoutubeData["length_seconds"] > 360) {
+            if ($videoYoutubeData["length_seconds"] > 330) {
                 return new JsonResponse(array(
                     "type" => "alert",
-                    "message" => "La vidéo Youtube dépasse les 6 min"
+                    "message" => "La vidéo Youtube dépasse les 3m 30s"
                 ), 200);
             }
 
