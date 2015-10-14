@@ -59,10 +59,12 @@
             EpitechDJ = new EpitechDJ({
                 loadCurrentVideoUri: "{{ path("app_player_current") }}",
                 loadQueueUri: "{{ path("app_player_queue") }}",
+                votesUri: "{{ path("app_player_votes") }}",
                 currentVideoLoaded: function (video) {
                     loadVideo(video);
                 },
-                queueLoaded: function (videos, haveToRedraw) {
+                votesLoaded: function (count, volume, heart, repeat) {
+                    youtubePlayer.setVolume(50 + volume);
                 }
             });
             EpitechDJ.sync();

@@ -13,6 +13,12 @@ use Raphy\Epitech\UserBundle\Entity\User;
  */
 class Vote
 {
+    const VOTE_TYPE_VOLUME_UP = "volume_up";
+    const VOTE_TYPE_VOLUME_DOWN = "volume_down";
+    const VOTE_TYPE_LIKE = "like";
+    const VOTE_TYPE_DISLIKE = "dislike";
+    const VOTE_TYPE_REPEAT = "repeat";
+
     /**
      * @var integer
      *

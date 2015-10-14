@@ -75,56 +75,65 @@
 
     <div class="row">
         <div class="small-12 columns">
-            <div class="alert-box notice">
-                <h5><span class="fa fa-fw fa-info"></span> Pour toutes remarques ou suggestions, n'hésitez pas à venir voir Raphael De Freitas ;)</h5>
-            </div>
-        </div>
-    </div>
-
-    {#<div class="row">
-        <div class="small-12 columns">
             <div class="panel">
+                <h3>Vote</h3>
+
+                <p class="lead">Vous pouvez effectuer 1 seul vote par vidéo</p>
+                <hr/>
                 <div class="row">
                     <div class="small-4 columns text-center">
-                        <span class="fa fa-thumbs-o-up"></span> 500
+                        <span class="fa fa-fw fa-volume-up"></span> <span id="vote-volume">50%</span>
                     </div>
                     <div class="small-4 columns text-center">
-                        <span class="fa fa-repeat"></span> 200
+                        <span class="fa fa-fw fa-heart"></span> <span id="vote-heart">0</span>
                     </div>
                     <div class="small-4 columns text-center">
-                        <span class="fa fa-thumbs-o-down"></span> 100
+                        <span class="fa fa-fw fa-refresh"></span> <span id="vote-repeat">0</span>
                     </div>
                 </div>
+                <hr/>
+                <div class="row">
+                    <div class="small-6 columns">
+                        <button id="vote-add-volume-up" class="full-width">
+                            <span class="fa fa-fw fa-volume-up"></span> Fais péter le son !
+                        </button>
+                    </div>
+                    <div class="small-6 columns">
+                        <button id="vote-add-volume-down" class="full-width">
+                            <span class="fa fa-fw fa-volume-down"></span> C'est trop fort !
+                        </button>
+                    </div>
+                </div>
+
+
+                {#<br/><div class="row">#}
+                    {#<div class="small-4 columns">#}
+                        {#<button id="vote-add-like" class="full-width">#}
+                            {#<span class="fa fa-fw fa-thumbs-up"></span> Remet moi ça !#}
+                        {#</button>#}
+                    {#</div>#}
+                    {#<div class="small-4 columns">#}
+                        {#<button id="vote-add-repeat" class="full-width">#}
+                            {#<span class="fa fa-fw fa-refresh"></span> Encore et encore !#}
+                        {#</button>#}
+                    {#</div>#}
+                    {#<div class="small-4 columns">#}
+                        {#<button id="vote-add-dislike" class="full-width">#}
+                            {#<span class="fa fa-fw fa-thumbs-down"></span> It's bulls**t !#}
+                        {#</button>#}
+                    {#</div>#}
+                {#</div>#}
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="small-12 columns">
-            <div class="panel">
-                <div class="row">
-                    <div class="small-4 columns text-center">
-                        <button class="full-width">
-                            <span class="fa fa-thumbs-o-up"></span> J'aime<br/>
-                            <span style="font-size: 14px">Réinsérer la vidéo en fin de liste après la lecture</span>
-                        </button>
-                    </div>
-                    <div class="small-4 columns text-center">
-                        <button class="full-width">
-                            <span class="fa fa-repeat"></span> Répéter<br/>
-                            <span style="font-size: 14px">Relire la vidéo après la lecture</span>
-                        </button>
-                    </div>
-                    <div class="small-4 columns text-center">
-                        <button class="full-width">
-                            <span class="fa fa-thumbs-o-down"></span> J'aime pas<br/>
-                            <span style="font-size: 14px">Passer la vidéo</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="alert-box notice">
+                <h5><span class="fa fa-fw fa-info"></span> Pour toutes remarques ou suggestions, n'hésitez pas à venir voir Raphael De Freitas ;)</h5>
             </div>
         </div>
-    </div>#}
+    </div>
 
 {% endblock %}
 
@@ -168,8 +177,12 @@
                 loadCurrentVideoUri: "{{ path("app_player_current") }}",
                 loadQueueUri: "{{ path("app_player_queue") }}",
                 addVideoUri: "{{ path("app_video_add") }}",
+                addVoteUri: "{{ path("app_vote_add") }}",
+                votesUri: "{{ path("app_player_votes") }}",
                 currentVideoLoaded: function (video) {
                     updateCurrentVideo(video.user, video.youtube.title);
+                    if (typeof vote != "undefined" && vote != null)
+                        vote.removeClass("success");
                 },
                 queueLoaded: function (videos, haveToRedraw) {
                     var queueItems = $("#queue-items");
@@ -192,8 +205,14 @@
                     result_add_video_modal_message.text(message);
                     result_add_video_modal.foundation("reveal", "open");
                     setReadyAddVideoButton();
+                },
+                votesLoaded: function (count, volume, heart, repeat) {
+                    $("#vote-volume").text((50 + volume) + "%");
+                    $("#vote-heart").text(heart);
+                    $("#vote-repeat").text(repeat);
                 }
             });
+            var vote = null;
             EpitechDJ.sync();
             setReadyAddVideoButton();
             $("#add-video-form-submit").click(function () {
@@ -201,6 +220,41 @@
                 var addVideoFormUrl = $("#add-video-form-url");
                 setLoadingAddVideoButton();
                 EpitechDJ.addVideo(addVideoFormUrl.val());
+            });
+            $("#vote-add-volume-up").click(function () {
+                if (vote != null)
+                    return;
+                vote = $("#vote-add-volume-up");
+                vote.addClass("success");
+                EpitechDJ.addVote("volume_up");
+            });
+            $("#vote-add-volume-down").click(function () {
+                if (vote != null)
+                    return;
+                vote = $("#vote-add-volume-down");
+                vote.addClass("success");
+                EpitechDJ.addVote("volume_down");
+            });
+            $("#vote-add-like").click(function () {
+                if (vote != null)
+                    return;
+                vote = $("#vote-add-like");
+                vote.addClass("success");
+                EpitechDJ.addVote("like");
+            });
+            $("#vote-add-repeat").click(function () {
+                if (vote != null)
+                    return;
+                vote = $("#vote-add-repeat");
+                vote.addClass("success");
+                EpitechDJ.addVote("repeat");
+            });
+            $("#vote-add-dislike").click(function () {
+                if (vote != null)
+                    return;
+                vote = $("#vote-add-dislike");
+                vote.addClass("success");
+                EpitechDJ.addVote("dislike");
             });
         });
 

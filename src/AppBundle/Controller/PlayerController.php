@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Video;
+use AppBundle\Entity\Vote;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -109,10 +110,18 @@ class PlayerController extends Controller
      */
     public function finishAction()
     {
-        $video = $video = $this->getCurrentVideo();
+        /**
+         * @var $votes Video[]
+         * @var $voteRepository EntityRepository
+         */
 
+        $video = $video = $this->getCurrentVideo();
         if ($video) {
             $this->getDoctrine()->getManager()->remove($video);
+            $voteRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Vote");
+            $votes = $voteRepository->findAll();
+            foreach ($votes as $vote)
+                $this->getDoctrine()->getManager()->remove($vote);
             $this->getDoctrine()->getManager()->flush();
         }
         return $this->currentAction();
@@ -121,19 +130,44 @@ class PlayerController extends Controller
     /**
      * @Security("has_role('ROLE_USER')")
      */
-    public function voteAction(Request $request)
+    public function votesAction(Request $request)
     {
-        if ($request->getMethod() === "GET") {
+        /**
+         * @var $votes Vote[]
+         * @var $vote Vote
+         * @var $voteRepository EntityRepository
+         */
 
-        } else {
+        $voteRepository = $this->getDoctrine()->getManager()->getRepository("AppBundle:Vote");
+        $votes = $voteRepository->findAll();
 
+        $votesArr = array(
+            "count" => count($votes),
+            "volume" => 0,
+            "heart" => 0,
+            "repeat" => 0
+        );
+
+        foreach ($votes as $vote) {
+            switch ($vote->getType()) {
+                case Vote::VOTE_TYPE_DISLIKE:
+                    $votesArr["heart"]--;
+                    break;
+                case Vote::VOTE_TYPE_LIKE:
+                    $votesArr["heart"]++;
+                    break;
+                case Vote::VOTE_TYPE_REPEAT:
+                    $votesArr["repeat"]++;
+                    break;
+                case Vote::VOTE_TYPE_VOLUME_DOWN:
+                    $votesArr["volume"]--;
+                    break;
+                case Vote::VOTE_TYPE_VOLUME_UP:
+                    $votesArr["volume"]++;
+                    break;
+            }
         }
-        $video = $video = $this->getCurrentVideo();
 
-        if ($video) {
-            $this->getDoctrine()->getManager()->remove($video);
-            $this->getDoctrine()->getManager()->flush();
-        }
-        return $this->currentAction();
+        return new JsonResponse($votesArr);
     }
 }

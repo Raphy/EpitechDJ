@@ -40,9 +40,22 @@ app_player_finish:
         _methods: POST
         _controller: AppBundle:Player:finish
 
+app_player_votes:
+    path:       /player/votes
+    defaults:
+        _methods: GET
+        _controller: AppBundle:Player:votes
+
 # Video
 app_video_add:
     path:       /video/add
     defaults:
         _methods: POST
         _controller: AppBundle:Video:add
+
+# Vote
+app_vote_add:
+    path:       /vote/add
+    defaults:
+        _methods: POST
+        _controller: AppBundle:Vote:add

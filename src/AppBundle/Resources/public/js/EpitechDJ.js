@@ -5,7 +5,10 @@ function EpitechDJ(params) {
         addVideoUri: null,
         currentVideoLoaded: null,
         queueLoaded: null,
-        videoAdded: null
+        videoAdded: null,
+        addVoteUri: null,
+        votesUri: null,
+        votesLoaded: null
     };
     for (param in defaultParams) {
         if (params.hasOwnProperty(param)) {
@@ -24,6 +27,8 @@ function EpitechDJ(params) {
     this["lastQueueTimestamp"] = 0;
     this["queue"] = [];
     this["ready"] = false;
+    this["loadVotesLock"] = false;
+    this["votes"] = {};
 }
 
 EpitechDJ.prototype.isReady = function () {
@@ -57,6 +62,13 @@ EpitechDJ.prototype.addVideo = function (url) {
             if (typeof self.videoAdded == "function")
                 self.videoAdded(response.type, response.message);
         });
+    }
+};
+
+EpitechDJ.prototype.addVote = function (type) {
+    if (this.addVoteUri != null) {
+        // Requesting
+        $.post(this.addVoteUri, {type: type});
     }
 };
 
@@ -117,6 +129,25 @@ EpitechDJ.prototype.sync = function () {
                     self.loadCurrentVideoLock = false;
                 });
             }
+
+            // Loading the votes
+            if (self.loadVotesLock == false && self.votesUri != null) {
+                // Locking
+                self.loadVotesLock = true;
+
+                // Requesting
+                $.get(self.votesUri).success(function (votes) {
+                    // User callback
+                    if (typeof self.votesLoaded == "function" && JSON.stringify(self.votes) !== JSON.stringify(votes))
+                        self.votesLoaded(votes.count, votes.volume, votes.heart, votes.repeat);
+                    self.votes = votes;
+
+                    // Unlocking
+                    self.loadVotesLock = false;
+                }).error(function () {
+                    self.loadVotesLock = false;
+                });
+            }
         };
-    })(this), 1000);
+    })(this), 2000);
 };
